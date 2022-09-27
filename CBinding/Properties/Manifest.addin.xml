@@ -37,6 +37,10 @@
 			extensions = "CMakeLists.txt,*.cmake"/>
 	</Extension>
 
+	<Extension path="/MonoDevelop/Ide/Composition">
+		<Assembly file="CBinding.dll"/>
+	</Extension>
+
 	<Extension path = "/MonoDevelop/Ide/FileTemplates">
 		<FileTemplate id = "EmptyCSourceFile" resource = "EmptyCSourceFile.xft.xml"/>
 		<FileTemplate id = "EmptyCHeaderFile" resource = "EmptyCHeaderFile.xft.xml"/>
@@ -64,8 +68,12 @@
 		<ProjectTemplate id = "ConsoleObjCProject" resource = "ConsoleObjCProject.xpt.xml"/>
 	</Extension>
 
+	<Extension path="/MonoDevelop/TextEditor/SupportedFileTypes">
+    <SupportedFileType id="x-csrc" extensions=".c" />
+  </Extension>
+
 	<Extension path = "/MonoDevelop/Core/MimeTypes">
-		<MimeType id="text/x-csrc" icon="md-c-file" isText="true">
+		<MimeType id="text/x-csrc" icon="md-c-file" _description="x-csrc" baseType="text/plain">
 			<File pattern="*.c" />
 		</MimeType>
 		<MimeType id="text/x-chdr" icon="md-h-file" isText="true">
@@ -258,6 +266,10 @@
 	<Extension path = "/MonoDevelop/ProjectModel/WorkspaceObjectReaders">
 		<Class class = "CBinding.CMakeWorkspaceObjectReader" />
 	</Extension>
+
+	<Runtime>
+		<Import assembly = "Microsoft.Data.Sqlite.dll"/>
+	</Runtime>
 
 <!-- Current Autotools AddIn is very .NET specific
 	<Module>

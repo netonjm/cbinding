@@ -1,4 +1,4 @@
-//
+﻿//
 // FunctionNodeBuilder.cs
 //
 // Authors:
@@ -29,29 +29,33 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using CBinding.Parser;
-using MonoDevelop.Ide;
-using MonoDevelop.Ide.Editor;
+using Microsoft.VisualStudio.Text.Editor;
 using MonoDevelop.Ide.Gui;
-using MonoDevelop.Ide.Gui.Components;
+using MonoDevelop.Ide.Gui.Documents;
+using MonoDevelop.Projects;
 
-namespace CBinding.Navigation
+namespace CBinding
 {
-
-    public class SymbolCommandHandler : NodeCommandHandler
+    public static class DocumentExtension
 	{
-		public override void ActivateItem ()
+		public static ITextView GetTextView(this Document document)
+        {
+			return document.GetContent<ITextView> ();
+		}
+
+		public static (int x, int y) GetCaretLocation (this ITextView textView)
 		{
-			Symbol item = (Symbol)CurrentNode.DataItem;
-            Document doc = IdeApp.Workbench.OpenDocument (item.FileName).Result;
-            bool isMacro = item is Macro;
+			return ((int)textView.Caret.Top, (int)textView.Caret.Left);
+		}
 
-			//   textView.Caret.MoveTo(textView.TextSnapshot.GetLineFromLineNumber(bp.Line).Start);
-			var textView = doc.GetTextView ();
-			var line = textView.TextSnapshot.GetLineFromLineNumber (item.Begin.Line);
-			textView.Caret.MoveTo (line.Start + item.Begin.Column);
+		public static DocumentController GetDocumentController (this Document textView)
+		{
+			return textView.GetContent<DocumentController> ();
+		}
 
-			//doc.Editor.CaretLocation = new DocumentLocation (item.Begin.Line, item.Begin.Column); // TODO: get column?
-        }
-    }
+		public static string GetText (this ITextView textView)
+		{
+			return textView.TextSnapshot.GetText();
+		}
+	}
 }

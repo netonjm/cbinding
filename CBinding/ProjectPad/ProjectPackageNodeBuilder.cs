@@ -96,8 +96,8 @@ namespace CBinding.ProjectPad
 			
 			package.ParsePackage ();
 			
-			PackageDetails details = new CBinding.PackageDetails (package);
-			details.Show ();
+			//PackageDetails details = new CBinding.PackageDetails (package);
+			//details.Show ();
 		}
 	}
 }

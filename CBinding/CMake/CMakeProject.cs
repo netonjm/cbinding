@@ -29,7 +29,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Gtk;
 using MonoDevelop.Core;
 using MonoDevelop.Core.Execution;
 using MonoDevelop.Ide;
@@ -290,8 +289,8 @@ namespace CBinding
 			});
 		}
 
-		protected override Task OnExecute (ProgressMonitor monitor, ExecutionContext context, ConfigurationSelector configuration)
-		{
+        protected override Task OnExecute (ProgressMonitor monitor, MonoDevelop.Projects.ExecutionContext context, ConfigurationSelector configuration, SolutionItemRunConfiguration runConfiguration)
+        {
 			return Task.Factory.StartNew (async () => {
 				ExternalConsole console = context.ExternalConsoleFactory.CreateConsole (false, monitor.CancellationToken);
 				string targetName = "";
@@ -343,8 +342,8 @@ namespace CBinding
 			return supportedLanguages;
 		}
 
-		protected override bool OnGetCanExecute (ExecutionContext context, ConfigurationSelector configuration)
-		{
+        protected override bool OnGetCanExecute (MonoDevelop.Projects.ExecutionContext context, ConfigurationSelector configuration, SolutionItemRunConfiguration runConfiguration)
+        {
 			foreach (CMakeTarget target in fileFormat.Targets.Values) {
 				if (target.Type == CMakeTarget.Types.Binary) return true;
 			}
@@ -430,16 +429,16 @@ namespace CBinding
 			if (!extensions.IsMatch (file))
 				return;
 
-			using (var dlg = new TargetPickerDialog ("Pick a target", fileFormat)) {
-				if (MessageService.ShowCustomDialog (dlg) != (int)ResponseType.Ok)
-					return;
+			//using (var dlg = new TargetPickerDialog ("Pick a target", fileFormat)) {
+			//	if (MessageService.ShowCustomDialog (dlg) != (int)ResponseType.Ok)
+			//		return;
 
-				foreach (var target in dlg.SelectedTargets) {
-					target.AddFile (file.CanonicalPath.ToRelative (fileFormat.File.ParentDirectory));
-				}
-			}
+			//	foreach (var target in dlg.SelectedTargets) {
+			//		target.AddFile (file.CanonicalPath.ToRelative (fileFormat.File.ParentDirectory));
+			//	}
+			//}
 
-			fileFormat.SaveAll ();
+			//fileFormat.SaveAll ();
 		}
 
 		public override void OnFilesAdded (List<FilePath> files)
@@ -455,15 +454,15 @@ namespace CBinding
 			if (filesToAdd.Count == 0)
 				return;
 
-			using (var dlg = new TargetPickerDialog ("Pick a target", fileFormat)) {
-				if (MessageService.ShowCustomDialog (dlg) != (int)ResponseType.Ok)
-					return;
+			//using (var dlg = new TargetPickerDialog ("Pick a target", fileFormat)) {
+			//	if (MessageService.ShowCustomDialog (dlg) != (int)ResponseType.Ok)
+			//		return;
 
-				foreach (var target in dlg.SelectedTargets) {
-					foreach (var file in filesToAdd)
-						target.AddFile (file.CanonicalPath.ToRelative (fileFormat.File.ParentDirectory));
-				}
-			}
+			//	foreach (var target in dlg.SelectedTargets) {
+			//		foreach (var file in filesToAdd)
+			//			target.AddFile (file.CanonicalPath.ToRelative (fileFormat.File.ParentDirectory));
+			//	}
+			//}
 
 			fileFormat.SaveAll ();
 		}

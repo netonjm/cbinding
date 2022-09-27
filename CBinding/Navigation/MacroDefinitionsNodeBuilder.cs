@@ -81,13 +81,13 @@ namespace CBinding.Navigation
 			
 			SymbolDatabaseMediator info = p.DB;
 
-			/*foreach (Macro m in info.Macros.Values) {
+            /*foreach (Macro m in info.Macros.Values) {
 				if(m.Ours)
 					treeBuilder.AddChild (m);
 			}*/
-		}
-		
-		public override bool HasChildNodes (ITreeBuilder builder, object dataObject)
+        }
+
+        public override bool HasChildNodes (ITreeBuilder builder, object dataObject)
 		{
 			return true;
 		}

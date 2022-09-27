@@ -36,6 +36,8 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using CBinding.Parser;
+using EnvDTE;
 using Mono.Addins;
 using MonoDevelop.Core;
 using MonoDevelop.Core.Execution;
@@ -60,7 +62,7 @@ namespace CBinding
 	}
 
 	[ExportProjectType ("{2857B73E-F847-4B02-9238-064979017E93}", Extension="cproj", Alias="C/C++")]
-	public class CProject : Project
+	public class CProject : MonoDevelop.Projects.Project
 	{
 		[ItemProperty ("Compiler", ValueType = typeof(CCompiler))]
 		public ICompiler CompilerManager { get; set; }
@@ -260,7 +262,7 @@ namespace CBinding
 			
 			CProjectConfiguration config = (CProjectConfiguration)GetConfiguration (configuration);
 			while (config == null) {
-				Thread.Sleep (20);
+                System.Threading.Thread.Sleep (20);
 				config = (CProjectConfiguration)GetConfiguration (configuration);
 			}
 			
@@ -304,7 +306,7 @@ namespace CBinding
 		/// This is the pkg-config package that gets deployed.
 		/// <returns>The pkg-config package's filename</returns>
 		/// </summary>
-		string WriteDeployablePgkPackage (Project project, CProjectConfiguration config)
+		string WriteDeployablePgkPackage (MonoDevelop.Projects.Project project, CProjectConfiguration config)
 		{
 			// FIXME: This should probably be grabed from somewhere.
 			string prefix = "/usr/local";
@@ -333,17 +335,9 @@ namespace CBinding
 			return pkgfile;
 		}
 
-		/// <summary>
-		/// Builds the project.
-		/// </summary>
-		/// <returns>The build result.</returns>
-		/// <param name="monitor">Progress monitor.</param>
-		/// <param name="configuration">Configuration to build.</param>
-		/// <remarks>This method is invoked to build the project. Support files such as files with the Copy to Output flag will
-		///  be copied before calling this method.</remarks>
-		protected override Task<BuildResult> DoBuild (ProgressMonitor monitor, ConfigurationSelector configuration)
-		{
-			var pc = (CProjectConfiguration) GetConfiguration (configuration);
+        protected override Task<BuildResult> OnBuild (ProgressMonitor monitor, ConfigurationSelector configuration, OperationContext operationContext)
+        {
+			var pc = (CProjectConfiguration)GetConfiguration (configuration);
 			pc.SourceDirectory = BaseDirectory;
 
 			return Task<BuildResult>.Factory.StartNew (delegate {
@@ -352,26 +346,55 @@ namespace CBinding
 					pc,
 					monitor);
 			});
-		}
+            //return base.OnBuild (monitor, configuration, operationContext);
+        }
 
-		/// <summary>
-		/// Cleans the files produced by this solution item
-		/// </summary>
-		/// <param name="monitor">A progress monitor</param>
-		/// <param name="configuration">Configuration to use to clean the project</param>
-		/// <param name="operationContext">Operation context.</param>
-		protected async override Task<BuildResult> OnClean (ProgressMonitor monitor, ConfigurationSelector configuration, OperationContext operationContext)
+        // <summary>
+        // Builds the project.
+        // </summary>
+        // <returns>The build result.</returns>
+        // <param name = "monitor" > Progress monitor.</param>
+        // <param name = "configuration" > Configuration to build.</param>
+        // <remarks>This method is invoked to build the project.Support files such as files with the Copy to Output flag will
+        //  be copied before calling this method.</remarks>
+        //      protected override Task<BuildResult> DoBuild (ProgressMonitor monitor, ConfigurationSelector configuration)
+        //{
+        //    var pc = (CProjectConfiguration)GetConfiguration (configuration);
+        //    pc.SourceDirectory = BaseDirectory;
+
+        //    return Task<BuildResult>.Factory.StartNew (delegate {
+        //        return CompilerManager.Compile (this,
+        //            Files, packages,
+        //            pc,
+        //            monitor);
+        //    });
+        //}
+
+
+        /// <summary>
+        /// Cleans the files produced by this solution item
+        /// </summary>
+        /// <param name="monitor">A progress monitor</param>
+        /// <param name="configuration">Configuration to use to clean the project</param>
+        /// <param name="operationContext">Operation context.</param>
+        protected async override Task<BuildResult> OnClean (ProgressMonitor monitor, ConfigurationSelector configuration, OperationContext operationContext)
 		{
 			var conf = (CProjectConfiguration) GetConfiguration (configuration);
 
-			var res = await base.OnClean (monitor, configuration, operationContext);
-			if (res.HasErrors)
-				return res;
+			//TargetEvaluationContext context = (operationContext as TargetEvaluationContext) ?? new TargetEvaluationContext (operationContext);
+
+
+			//return (await RunTargetInternal (monitor, "Clean", configuration, context)).BuildResult;
+
+			//var res = await base.OnClean (monitor, configuration, operationContext);
+			//if (res.HasErrors)
+			//	return res;
 
 			await Task.Run (() => Compiler.Clean (Files, conf, monitor));
 
-			return res;
+			return BuildResult.CreateSuccess ();
 		}
+
 
 		/// <summary>
 		/// Creates the execution command for the project.
@@ -393,9 +416,9 @@ namespace CBinding
 		/// </summary>
 		/// <param name="context">Context.</param>
 		/// <param name="solutionConfiguration">Solution configuration.</param>
-		protected override bool OnGetCanExecute (MonoDevelop.Projects.ExecutionContext context, ConfigurationSelector solutionConfiguration)
-		{
-			var conf = (CProjectConfiguration) GetConfiguration (solutionConfiguration);
+		protected override bool OnGetCanExecute (MonoDevelop.Projects.ExecutionContext context, ConfigurationSelector configuration, SolutionItemRunConfiguration runConfiguration)
+        {
+			var conf = (CProjectConfiguration)GetConfiguration (configuration);
 			ExecutionCommand cmd = CreateExecutionCommand (conf);
 			return (target == CompileTarget.Exe) && context.ExecutionHandler.CanExecute (cmd);
 		}
@@ -407,24 +430,24 @@ namespace CBinding
 		/// <param name="context">Execution context.</param>
 		/// <param name="configuration">Configuration to execute.</param>
 		/// <returns>The execute.</returns>
-		protected async override Task DoExecute (ProgressMonitor monitor, MonoDevelop.Projects.ExecutionContext context, ConfigurationSelector configuration)
-		{
-			var conf = (CProjectConfiguration) GetConfiguration (configuration);
+		protected override async Task OnExecute (ProgressMonitor monitor, MonoDevelop.Projects.ExecutionContext context, ConfigurationSelector configuration, SolutionItemRunConfiguration runConfiguration)
+        {
+			var conf = (CProjectConfiguration)GetConfiguration (configuration);
 			bool pause = conf.PauseConsoleOutput;
 			OperationConsole console;
-			
+
 			if (conf.CompileTarget != CompileTarget.Exe) {
 				MessageService.ShowMessage ("Compile target is not an executable!");
 				return;
 			}
-			
+
 			monitor.Log.WriteLine ("Running project...");
-			
+
 			if (conf.ExternalConsole)
 				console = context.ExternalConsoleFactory.CreateConsole (!pause, monitor.CancellationToken);
 			else
 				console = context.ConsoleFactory.CreateConsole (monitor.CancellationToken);
-			
+
 			try {
 				ExecutionCommand cmd = CreateExecutionCommand (conf);
 				if (!context.ExecutionHandler.CanExecute (cmd)) {
@@ -435,12 +458,12 @@ namespace CBinding
 				ProcessAsyncOperation op = context.ExecutionHandler.Execute (cmd, console);
 				using (var t = monitor.CancellationToken.Register (op.Cancel))
 					await op.Task;
-				
+
 				monitor.Log.WriteLine ("The operation exited with code: {0}", op.ExitCode);
 			} catch (Exception ex) {
 				LoggingService.LogError (string.Format ("Cannot execute \"{0}\"", conf.Output), ex);
 				monitor.ReportError ("Cannot execute \"" + conf.Output + "\"", ex);
-			} finally {			
+			} finally {
 				console.Dispose ();
 			}
 		}

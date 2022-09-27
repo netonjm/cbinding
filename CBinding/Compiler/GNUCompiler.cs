@@ -79,7 +79,12 @@ namespace CBinding
 			CompilerResults cr = new CompilerResults (new TempFileCollection ());
 			bool success = true;
 			string compilerArgs = GetCompilerFlags (project, configuration) + " " + GeneratePkgCompilerArgs (packages);
-			
+
+			if (!System.IO.Directory.Exists(configuration.OutputDirectory))
+			{
+				System.IO.Directory.CreateDirectory(configuration.OutputDirectory);
+			}
+
 			string outputName = Path.Combine (configuration.OutputDirectory,
 			                                  configuration.CompiledOutputName);
 			

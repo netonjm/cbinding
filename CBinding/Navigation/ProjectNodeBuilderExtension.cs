@@ -63,21 +63,25 @@ namespace CBinding.Navigation
 			//TagDatabaseManager.Instance.FileUpdated -= OnFinishedBuildingTree;
 		}
 		
+	*/
+
 		public static void CreatePadTree (object o)
 		{
 			CProject p = o as CProject;
 			if (o == null) return;
 
 			//this happens in CDocumentParser.Parse
-			/*try {
-				foreach (ProjectFile f in p.Files) {
-					if (f.BuildAction == BuildAction.Compile)
-						TagDatabaseManager.Instance.UpdateFileTags (p, f.Name);
+			try {
+                foreach (ProjectFile f in p.Files) {
+                    if (f.BuildAction == BuildAction.Compile) {
+						Console.WriteLine ("");
+						// TagDatabaseManager.Instance.UpdateFileTags (p, f.Name);
+					}
 				}
-			} catch (IOException) {
+            } catch (IOException) {
 				return;
 			}
-		}*/
+		}
 		
 		public override void BuildChildNodes (ITreeBuilder builder, object dataObject)
 		{			
@@ -126,19 +130,19 @@ namespace CBinding.Navigation
 	
 	public class ProjectNodeBuilderExtensionHandler : NodeCommandHandler
 	{
-//		public override void ActivateItem ()
-//		{
-//			CProject p = CurrentNode.DataItem as CProject;
-//			
-//			if (p == null) return;
-//			
-//			Thread builderThread = new Thread (new ParameterizedThreadStart (ProjectNodeBuilderExtension.CreatePadTree));
-//			builderThread.Name = "PadBuilder";
-//			builderThread.IsBackground = true;
-//			builderThread.Start (p);
-//		}
-		
-		[CommandHandler (CProjectCommands.UpdateClassPad)]
+        public override void ActivateItem ()
+        {
+            CProject p = CurrentNode.DataItem as CProject;
+
+            if (p == null) return;
+
+            Thread builderThread = new Thread (new ParameterizedThreadStart (ProjectNodeBuilderExtension.CreatePadTree));
+            builderThread.Name = "PadBuilder";
+            builderThread.IsBackground = true;
+            builderThread.Start (p);
+        }
+
+        [CommandHandler (CProjectCommands.UpdateClassPad)]
 		public void UpdateClassPad ()
 		{
 		}

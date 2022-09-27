@@ -39,7 +39,8 @@ namespace CBinding.ProjectPad
 		public override void BuildNode (ITreeBuilder treeBuilder, object dataObject, NodeInfo nodeInfo)
 		{
 			var item = (SolutionItem)dataObject;
-			nodeInfo.Label = GLib.Markup.EscapeText (item.Name);
+			//TODO: Remove GLib
+			nodeInfo.Label = item.Name; //GLib.Markup.EscapeText ();
 			nodeInfo.Icon = Context.GetIcon (Stock.Project);
 			nodeInfo.ClosedIcon = Context.GetIcon (Stock.Project);
 		}

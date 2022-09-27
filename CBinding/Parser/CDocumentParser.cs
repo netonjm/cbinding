@@ -28,30 +28,46 @@ using System;
 using MonoDevelop.Ide.TypeSystem;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
 
 namespace CBinding.Parser
 {
-	
+ //   public static class CDocumentParserHelper
+	//{
+	//	public static Task<ParsedDocument> Parse (ParseOptions options, CancellationToken cancellationToken)
+ //       {
+ //           var fileName = options.FileName;
+ //           var project = (CProject)options.Project;
+ //           if (project == null || !project.HasLibClang)
+ //               return Task.FromResult ((ParsedDocument)new DefaultParsedDocument (fileName));
 
-	/// <summary>
-	/// clang-based document parser helper
-	/// </summary>
-	public class CDocumentParser:  TypeSystemParser
-	{
-		
-		public override Task<ParsedDocument> Parse(ParseOptions options, CancellationToken cancellationToken)
-		{
-			var fileName = options.FileName;
-			var project = (CProject)options.Project;
-				if (project == null || !project.HasLibClang)
-					return Task.FromResult ((ParsedDocument)new DefaultParsedDocument (fileName));
+ //           return Task.Run (() => {
+ //               var doc = new CParsedDocument (project, fileName);
+ //               doc.Flags |= ParsedDocumentFlags.NonSerializable;
+ //               doc.ParseAndDiagnose (cancellationToken);
+ //               return (ParsedDocument)doc;
+ //           }, cancellationToken);
+ //       }
+ //   }
+	// <summary>
+	// clang-based document parser helper
+	// </summary>
+	//public class CDocumentParser : TypeSystemParser
+	//   {
 
-			return Task.Run (() => {
-				var doc = new CParsedDocument (project, fileName);
-				doc.Flags |= ParsedDocumentFlags.NonSerializable;
-				doc.ParseAndDiagnose (cancellationToken);
-				return (ParsedDocument)doc;
-			}, cancellationToken);
-		}
-	}
+	//       public override Task<ParsedDocument> Parse (ParseOptions options, CancellationToken cancellationToken)
+	//       {
+	//           var fileName = options.FileName;
+	//           var project = (CProject)options.Project;
+	//           if (project == null || !project.HasLibClang)
+	//               return Task.FromResult ((ParsedDocument)new DefaultParsedDocument (fileName));
+
+	//           return Task.Run (() => {
+	//               var doc = new CParsedDocument (project, fileName);
+	//               doc.Flags |= ParsedDocumentFlags.NonSerializable;
+	//               doc.ParseAndDiagnose (cancellationToken);
+	//               return (ParsedDocument)doc;
+	//           }, cancellationToken);
+	//       }
+	//   }
 }

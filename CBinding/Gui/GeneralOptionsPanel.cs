@@ -37,154 +37,156 @@ using Mono.Addins;
 using MonoDevelop.Core;
 using MonoDevelop.Components;
 using MonoDevelop.Ide.Gui.Dialogs;
+using AppKit;
 
 namespace CBinding
 {
-	public partial class GeneralOptionsPanel : Gtk.Bin
-	{
-		ICompiler default_c_compiler;
-		List<ICompiler> c_compilers = new List<ICompiler> ();
-		
-		ICompiler default_cpp_compiler;
-		List<ICompiler> cpp_compilers = new List<ICompiler> ();
-		
-		public GeneralOptionsPanel ()
-		{
-			this.Build ();
-			
-			object[] compilers = AddinManager.GetExtensionObjects ("/CBinding/Compilers");
-		
-			foreach (ICompiler compiler in compilers) {
-				if (compiler.Language == Language.C) {
-					c_compilers.Add (compiler);
-				} else if (compiler.Language == Language.CPP) {
-					cpp_compilers.Add (compiler);
-				}
-			}
-			
-			foreach (ICompiler compiler in c_compilers)
-				cCombo.AppendText (compiler.Name);
-			
-			foreach (ICompiler compiler in cpp_compilers)
-				cppCombo.AppendText (compiler.Name);
-			
-			string c_compiler = PropertyService.Get<string> ("CBinding.DefaultCCompiler", new GccCompiler ().Name);
-			string cpp_compiler = PropertyService.Get<string> ("CBinding.DefaultCppCompiler", new GppCompiler ().Name);
-			ctagsEntry.Text = PropertyService.Get<string> ("CBinding.CTagsExecutable", "ctags");
-			parseSystemTagsCheck.Active = PropertyService.Get<bool> ("CBinding.ParseSystemTags", true);
-			parseLocalVariablesCheck.Active = PropertyService.Get<bool> ("CBinding.ParseLocalVariables", false);
-			
-			foreach (ICompiler compiler in c_compilers) {
-				if (compiler.Name == c_compiler) {
-					default_c_compiler = compiler;
-				}
-			}
-			
-			if (default_c_compiler == null)
-				default_c_compiler = new GccCompiler ();
-			
-			foreach (ICompiler compiler in cpp_compilers) {
-				if (compiler.Name == cpp_compiler) {
-					default_cpp_compiler = compiler;
-				}
-			}
-			
-			if (default_cpp_compiler == null)
-				default_cpp_compiler = new GppCompiler ();
-			
-			int active;
-			Gtk.TreeIter iter;
-			Gtk.ListStore store;
-			
-			active = 0;
-			store = (Gtk.ListStore)cCombo.Model;
-			store.GetIterFirst (out iter);
-			
-			while (store.IterIsValid (iter)) {
-				if ((string)store.GetValue (iter, 0) == default_c_compiler.Name) {
-					break;
-				}
-				store.IterNext (ref iter);
-				active++;
-			}
+    public class GeneralOptionsPanel : NSViewController
+    {
+        ICompiler default_c_compiler;
+        List<ICompiler> c_compilers = new List<ICompiler> ();
 
-			cCombo.Active = active;
-			
-			active = 0;
-			store = (Gtk.ListStore)cppCombo.Model;
-			store.GetIterFirst (out iter);
-			
-			while (store.IterIsValid (iter)) {
-				if ((string)store.GetValue (iter, 0) == default_cpp_compiler.Name) {
-					break;
-				}
-				store.IterNext (ref iter);
-				active++;
-			}
+        ICompiler default_cpp_compiler;
+        List<ICompiler> cpp_compilers = new List<ICompiler> ();
 
-			cppCombo.Active = active;
-		}
-		
-		public bool Store ()
-		{
-			PropertyService.Set ("CBinding.DefaultCCompiler", default_c_compiler.Name);
-			PropertyService.Set ("CBinding.DefaultCppCompiler", default_cpp_compiler.Name);
-			PropertyService.Set ("CBinding.CTagsExecutable", ctagsEntry.Text.Trim ());
-			PropertyService.Set ("CBinding.ParseSystemTags", parseSystemTagsCheck.Active);
-			PropertyService.Set ("CBinding.ParseLocalVariables", parseLocalVariablesCheck.Active);
-			PropertyService.SaveProperties ();
-			return true;
-		}
+        public GeneralOptionsPanel ()
+        {
 
-		protected virtual void OnCComboChanged (object sender, System.EventArgs e)
-		{
-			 string activeCompiler = cCombo.ActiveText;
-			
-			foreach (ICompiler compiler in c_compilers) {
-				if (compiler.Name == activeCompiler) {
-				 	default_c_compiler = compiler;
-				}
-			}
-			
-			if (default_c_compiler == null)
-				default_c_compiler = new GccCompiler ();
-		}
+            View = new NSView () { TranslatesAutoresizingMaskIntoConstraints = false };
+            
+            object [] compilers = AddinManager.GetExtensionObjects ("/CBinding/Compilers");
 
-		protected virtual void OnCppComboChanged (object sender, System.EventArgs e)
-		{
-			string activeCompiler = cppCombo.ActiveText;
-			
-			foreach (ICompiler compiler in cpp_compilers) {
-				if (compiler.Name == activeCompiler) {
-				 	default_cpp_compiler = compiler;
-				}
-			}
-			
-			if (default_cpp_compiler == null)
-				default_cpp_compiler = new GppCompiler ();
-		}
-		
-		protected virtual void OnCtagsBrowseClicked (object sender, EventArgs e)
-		{
-			var dialog = new OpenFileDialog (GettextCatalog.GetString ("Choose ctags executable"), FileChooserAction.Open);
-			if (dialog.Run ())
-				ctagsEntry.Text = dialog.SelectedFile;
-		}
-	}
-	
-	public class GeneralOptionsPanelBinding : OptionsPanel
-	{
-		private GeneralOptionsPanel panel;
-		
-		public override Control CreatePanelWidget ()
-		{
-			panel = new GeneralOptionsPanel ();
-			return panel;
-		}
-		
-		public override void ApplyChanges ()
-		{
-			panel.Store ();
-		}
-	}
+            foreach (ICompiler compiler in compilers) {
+                if (compiler.Language == Language.C) {
+                    c_compilers.Add (compiler);
+                } else if (compiler.Language == Language.CPP) {
+                    cpp_compilers.Add (compiler);
+                }
+            }
+
+            //foreach (ICompiler compiler in c_compilers)
+            //    cCombo.AppendText (compiler.Name);
+
+            //foreach (ICompiler compiler in cpp_compilers)
+            //    cppCombo.AppendText (compiler.Name);
+
+            //string c_compiler = PropertyService.Get<string> ("CBinding.DefaultCCompiler", new GccCompiler ().Name);
+            //string cpp_compiler = PropertyService.Get<string> ("CBinding.DefaultCppCompiler", new GppCompiler ().Name);
+            //ctagsEntry.Text = PropertyService.Get<string> ("CBinding.CTagsExecutable", "ctags");
+            //parseSystemTagsCheck.Active = PropertyService.Get<bool> ("CBinding.ParseSystemTags", true);
+            //parseLocalVariablesCheck.Active = PropertyService.Get<bool> ("CBinding.ParseLocalVariables", false);
+
+            //foreach (ICompiler compiler in c_compilers) {
+            //    if (compiler.Name == c_compiler) {
+            //        default_c_compiler = compiler;
+            //    }
+            //}
+
+            if (default_c_compiler == null)
+                default_c_compiler = new GccCompiler ();
+
+            //foreach (ICompiler compiler in cpp_compilers) {
+            //    if (compiler.Name == cpp_compiler) {
+            //        default_cpp_compiler = compiler;
+            //    }
+            //}
+
+            if (default_cpp_compiler == null)
+                default_cpp_compiler = new GppCompiler ();
+
+            int active;
+            //Gtk.TreeIter iter;
+            //Gtk.ListStore store;
+
+            active = 0;
+            //store = (Gtk.ListStore)cCombo.Model;
+            //store.GetIterFirst (out iter);
+
+            //while (store.IterIsValid (iter)) {
+            //    if ((string)store.GetValue (iter, 0) == default_c_compiler.Name) {
+            //        break;
+            //    }
+            //    store.IterNext (ref iter);
+            //    active++;
+            //}
+
+            //cCombo.Active = active;
+
+            //active = 0;
+            //store = (Gtk.ListStore)cppCombo.Model;
+            //store.GetIterFirst (out iter);
+
+            //while (store.IterIsValid (iter)) {
+            //    if ((string)store.GetValue (iter, 0) == default_cpp_compiler.Name) {
+            //        break;
+            //    }
+            //    store.IterNext (ref iter);
+            //    active++;
+            //}
+
+            //cppCombo.Active = active;
+        }
+
+        public bool Store ()
+        {
+            PropertyService.Set ("CBinding.DefaultCCompiler", default_c_compiler.Name);
+            PropertyService.Set ("CBinding.DefaultCppCompiler", default_cpp_compiler.Name);
+            //PropertyService.Set ("CBinding.CTagsExecutable", ctagsEntry.Text.Trim ());
+            //PropertyService.Set ("CBinding.ParseSystemTags", parseSystemTagsCheck.Active);
+            //PropertyService.Set ("CBinding.ParseLocalVariables", parseLocalVariablesCheck.Active);
+            PropertyService.SaveProperties ();
+            return true;
+        }
+
+        protected virtual void OnCComboChanged (object sender, System.EventArgs e)
+        {
+            //string activeCompiler = cCombo.ActiveText;
+
+            //foreach (ICompiler compiler in c_compilers) {
+            //    if (compiler.Name == activeCompiler) {
+            //        default_c_compiler = compiler;
+            //    }
+            //}
+
+            //if (default_c_compiler == null)
+            //    default_c_compiler = new GccCompiler ();
+        }
+
+        protected virtual void OnCppComboChanged (object sender, System.EventArgs e)
+        {
+            //string activeCompiler = cppCombo.ActiveText;
+
+            //foreach (ICompiler compiler in cpp_compilers) {
+            //    if (compiler.Name == activeCompiler) {
+            //        default_cpp_compiler = compiler;
+            //    }
+            //}
+
+            //if (default_cpp_compiler == null)
+            //    default_cpp_compiler = new GppCompiler ();
+        }
+
+        protected virtual void OnCtagsBrowseClicked (object sender, EventArgs e)
+        {
+            var dialog = new OpenFileDialog (GettextCatalog.GetString ("Choose ctags executable"), FileChooserAction.Open);
+            //if (dialog.Run ())
+            //    ctagsEntry.Text = dialog.SelectedFile;
+        }
+    }
+
+    public class GeneralOptionsPanelBinding : OptionsPanel
+    {
+        private GeneralOptionsPanel panel;
+
+        public override Control CreatePanelWidget ()
+        {
+            panel ??= new GeneralOptionsPanel ();
+            return panel.View;
+        }
+
+        public override void ApplyChanges ()
+        {
+            panel.Store ();
+        }
+    }
 }

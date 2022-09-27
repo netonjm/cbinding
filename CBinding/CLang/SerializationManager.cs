@@ -62,7 +62,7 @@ namespace CBinding
 
 			if (error) {
 				File.Delete (fname);
-				Gtk.Application.Invoke (
+				Runtime.RunInMainThread (
 					delegate {
 						IdeApp.Workbench.StatusBar.ShowError ("Generating the PCH failed. Is the header you edited valid by all means? (" + ec + "&" + se + ")");
 					}

@@ -38,55 +38,55 @@ using System.Text;
 
 namespace CBinding.Parser
 {
-	sealed class DataWrapper : ParameterHintingData
-	{
-		readonly OverloadCandidate Overload;
+	//sealed class DataWrapper : ParameterHintingData
+	//{
+	//	readonly OverloadCandidate Overload;
 
-		public DataWrapper (OverloadCandidate overload) : base (null)
-		{
-			Overload = overload;
-		}
+	//	public DataWrapper (OverloadCandidate overload) : base (null)
+	//	{
+	//		Overload = overload;
+	//	}
 
-		public DataWrapper () : base (null)
-		{
-		}
+	//	public DataWrapper () : base (null)
+	//	{
+	//	}
 
-		public override int ParameterCount {
-			get { return Overload.Parameters.Count; }
-		}
+	//	public override int ParameterCount {
+	//		get { return Overload.Parameters.Count; }
+	//	}
 
-		public override bool IsParameterListAllowed {
-			get { return false; }
-		}
+	//	public override bool IsParameterListAllowed {
+	//		get { return false; }
+	//	}
 
-		public override string GetParameterName (int parameter)
-		{
-			return Overload.Parameters[parameter];
-		}
+	//	public override string GetParameterName (int parameter)
+	//	{
+	//		return Overload.Parameters[parameter];
+	//	}
 
-		public override Task<TooltipInformation> CreateTooltipInformation (TextEditor editor, DocumentContext ctx, int currentParameter, bool smartWrap, CancellationToken ctoken)
-		{
-			var tooltip = new TooltipInformation ();
-			string sig = Overload.Returns + " " + Overload.Name;
-			StringBuilder builder = new StringBuilder(sig);
+	//	public override Task<TooltipInformation> CreateTooltipInformation (TextEditor editor, DocumentContext ctx, int currentParameter, bool smartWrap, CancellationToken ctoken)
+	//	{
+	//		var tooltip = new TooltipInformation ();
+	//		string sig = Overload.Returns + " " + Overload.Name;
+	//		StringBuilder builder = new StringBuilder(sig);
 
-			builder.Append ("(" + Environment.NewLine);
-			int i = 0;
-			foreach(string t in Overload.Parameters) {
-				if(i.Equals (currentParameter)) {
-					builder.Append ("\t<b>" + GLib.Markup.EscapeText (t) + "</b>" + Environment.NewLine);
-				}
-				else {
-					builder.Append ("\t" + GLib.Markup.EscapeText (t) + Environment.NewLine);
-				}
-				i++;
-			}
-			builder.Append (")");
+	//		builder.Append ("(" + Environment.NewLine);
+	//		int i = 0;
+	//		foreach(string t in Overload.Parameters) {
+	//			if(i.Equals (currentParameter)) {
+	//				builder.Append ("\t<b>" + GLib.Markup.EscapeText (t) + "</b>" + Environment.NewLine);
+	//			}
+	//			else {
+	//				builder.Append ("\t" + GLib.Markup.EscapeText (t) + Environment.NewLine);
+	//			}
+	//			i++;
+	//		}
+	//		builder.Append (")");
 
-			tooltip.SignatureMarkup = builder.ToString ();
-			tooltip.SummaryMarkup = "";
+	//		tooltip.SignatureMarkup = builder.ToString ();
+	//		tooltip.SummaryMarkup = "";
 
-			return Task.FromResult<TooltipInformation> (tooltip);
-		}
-	}
+	//		return Task.FromResult<TooltipInformation> (tooltip);
+	//	}
+	//}
 }

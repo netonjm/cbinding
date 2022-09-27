@@ -29,61 +29,114 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using AppKit;
 using System;
 
 namespace CBinding
 {
-	public partial class PackageDetails : Gtk.Dialog
-	{
-		Gtk.ListStore requiresStore = new Gtk.ListStore (typeof(string));
-		Gtk.ListStore libPathsStore = new Gtk.ListStore (typeof(string));
-		Gtk.ListStore libsStore = new Gtk.ListStore (typeof(string));
-		Gtk.ListStore cflagsStore = new Gtk.ListStore (typeof(string));
-		
-		public PackageDetails (Package package)
-		{
-			this.Build();
-			
-			package.ParsePackage ();
-			
-			Gtk.CellRendererText textRenderer = new Gtk.CellRendererText ();
-			
-			requiresTreeView.Model = requiresStore;
-			requiresTreeView.AppendColumn ("Requires", textRenderer, "text", 0);
-			requiresTreeView.HeadersVisible = false;
-			
-			libPathsTreeView.Model = libPathsStore;
-			libPathsTreeView.AppendColumn ("LibPaths", textRenderer, "text", 0);
-			libPathsTreeView.HeadersVisible = false;
-			
-			libsTreeView.Model = libsStore;
-			libsTreeView.AppendColumn ("Libs", textRenderer, "text", 0);
-			libsTreeView.HeadersVisible = false;
-			
-			cflagsTreeView.Model = cflagsStore;
-			cflagsTreeView.AppendColumn ("CFlags", textRenderer, "text", 0);
-			cflagsTreeView.HeadersVisible = false;
-			
-			nameLabel.Text = package.Name;
-			descriptionLabel.Text = package.Description;
-			versionLabel.Text = package.Version;
-			
+    public class PackageDetailsViewController : NSViewController
+    {
+        List<string> requiresStore = new List<string> ();
+        List<string> libPathsStore = new List<string> ();
+        List<string> libsStore = new List<string> ();
+        List<string> cflagsStore = new List<string> ();
+
+		public PackageDetailsViewController (Package package)
+        {
+            package.ParsePackage ();
+
+            var stackView = new NSStackView () {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                Orientation = NSUserInterfaceLayoutOrientation.Vertical,
+                Alignment = NSLayoutAttribute.Leading,
+                Distribution = NSStackViewDistribution.Fill
+            };
+            View = stackView;
+
+			var contentScrollView = new NSScrollView () { TranslatesAutoresizingMaskIntoConstraints = false };
+			stackView.AddArrangedSubview (contentScrollView);
+
+			contentScrollView.LeadingAnchor.ConstraintEqualTo (stackView.LeadingAnchor).Active = true;
+			contentScrollView.TrailingAnchor.ConstraintEqualTo (stackView.TrailingAnchor).Active = true;
+
+			var contentStackView = new NSStackView () {
+				TranslatesAutoresizingMaskIntoConstraints = false,
+				Orientation = NSUserInterfaceLayoutOrientation.Vertical,
+				Alignment = NSLayoutAttribute.Leading,
+				Distribution = NSStackViewDistribution.Fill
+			};
+			contentScrollView.DocumentView = contentStackView;
+
+			var requiresTreeView = new NSTableView () { TranslatesAutoresizingMaskIntoConstraints = false };
+			contentStackView.AddArrangedSubview (requiresTreeView);
+
+			requiresTreeView.HeightAnchor.ConstraintEqualTo (130).Active = true;
+			requiresTreeView.LeadingAnchor.ConstraintEqualTo (contentStackView.LeadingAnchor).Active = true;
+			requiresTreeView.TrailingAnchor.ConstraintEqualTo (contentStackView.TrailingAnchor).Active = true;
+
+			var libPathsTreeView = new NSTableView () { TranslatesAutoresizingMaskIntoConstraints = false };
+			contentStackView.AddArrangedSubview (libPathsTreeView);
+
+			libPathsTreeView.HeightAnchor.ConstraintEqualTo (130).Active = true;
+			libPathsTreeView.LeadingAnchor.ConstraintEqualTo (contentStackView.LeadingAnchor).Active = true;
+			libPathsTreeView.TrailingAnchor.ConstraintEqualTo (contentStackView.TrailingAnchor).Active = true;
+
+			var libsTreeView = new NSTableView () { TranslatesAutoresizingMaskIntoConstraints = false };
+			contentStackView.AddArrangedSubview (libsTreeView);
+
+			libsTreeView.HeightAnchor.ConstraintEqualTo (130).Active = true;
+			libsTreeView.LeadingAnchor.ConstraintEqualTo (contentStackView.LeadingAnchor).Active = true;
+			libsTreeView.TrailingAnchor.ConstraintEqualTo (contentStackView.TrailingAnchor).Active = true;
+
+			var cflagsTreeView = new NSTableView () { TranslatesAutoresizingMaskIntoConstraints = false };
+			contentStackView.AddArrangedSubview (cflagsTreeView);
+
+			cflagsTreeView.HeightAnchor.ConstraintEqualTo (130).Active = true;
+			cflagsTreeView.LeadingAnchor.ConstraintEqualTo (contentStackView.LeadingAnchor).Active = true;
+			cflagsTreeView.TrailingAnchor.ConstraintEqualTo (contentStackView.TrailingAnchor).Active = true;
+
+			contentStackView.AddArrangedSubview (new NSView () { TranslatesAutoresizingMaskIntoConstraints = false });
+
 			foreach (string req in package.Requires)
-				requiresStore.AppendValues (req);
-			
-			foreach (string libpath in package.LibPaths)
-				libPathsStore.AppendValues (libpath);
-			
-			foreach (string lib in package.Libs)
-				libsStore.AppendValues (lib);
-			
-			foreach (string cflag in package.CFlags)
-				cflagsStore.AppendValues (cflag);
+                requiresStore.Add (req);
+
+            foreach (string libpath in package.LibPaths)
+                libPathsStore.Add (libpath);
+
+            foreach (string lib in package.Libs)
+                libsStore.Add (lib);
+
+            foreach (string cflag in package.CFlags)
+                cflagsStore.Add (cflag);
+
+            requiresTreeView.ReloadData ();
+            libPathsTreeView.ReloadData ();
+            libsTreeView.ReloadData ();
+			cflagsTreeView.ReloadData ();
+
+			var toolboxStackView = new NSStackView () {
+				TranslatesAutoresizingMaskIntoConstraints = false,
+				Orientation = NSUserInterfaceLayoutOrientation.Horizontal,
+				Alignment = NSLayoutAttribute.CenterX,
+				Distribution = NSStackViewDistribution.Fill
+			};
+			stackView.AddArrangedSubview (toolboxStackView);
+			toolboxStackView.LeadingAnchor.ConstraintEqualTo (stackView.LeadingAnchor).Active = true;
+			toolboxStackView.TrailingAnchor.ConstraintEqualTo (stackView.TrailingAnchor).Active = true;
+
+			toolboxStackView.AddArrangedSubview (new NSView());
+
+			var okButton = new NSButton () { TranslatesAutoresizingMaskIntoConstraints = false, Title = "Ok" };
+			okButton.BezelStyle = NSBezelStyle.RoundRect;
+			toolboxStackView.AddArrangedSubview (okButton);
+			okButton.WidthAnchor.ConstraintEqualTo (200).Active = true;
+
+			okButton.Activated += OnButtonOkClicked;
 		}
 
 		protected virtual void OnButtonOkClicked (object sender, System.EventArgs e)
-		{
-			Destroy ();
-		}
-	}
+        {
+            View.Window.Close ();
+        }
+    }
 }

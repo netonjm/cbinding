@@ -37,76 +37,77 @@ using MonoDevelop.Core;
 using MonoDevelop.Components;
 using MonoDevelop.Ide.Projects;
 using MonoDevelop.Ide.Gui.Dialogs;
+using AppKit;
 
 namespace CBinding
 {
-	public partial class OutputOptionsPanel : Gtk.Bin
-	{
-		private CProjectConfiguration configuration;
-		
-		public OutputOptionsPanel ()
-		{
-			this.Build ();
-			table1.RowSpacing = 3;
-		}
-		
-		public void Load (CProjectConfiguration configuration)
-		{
-			this.configuration = configuration;
-			
-			outputNameTextEntry.Text = configuration.Output;
-			outputEntry.Path = configuration.OutputDirectory;
-			parametersTextEntry.Text = configuration.CommandLineParameters;
-			
-			if (externalConsoleCheckbox.Active)
-				pauseCheckbox.Sensitive = true;
-			
-			externalConsoleCheckbox.Active = configuration.ExternalConsole;
-			pauseCheckbox.Active = configuration.PauseConsoleOutput;
-		}
-		
-		public void Store ()
-		{
-			if (configuration == null)
-				return;
-			
-			if (outputNameTextEntry != null && outputNameTextEntry.Text.Length > 0)
-				configuration.Output = outputNameTextEntry.Text.Trim ();
-			
-			var newPath = outputEntry.Path.Trim ();
-			if (!string.IsNullOrEmpty (newPath))
-				configuration.OutputDirectory = newPath;
-			
-			if (parametersTextEntry.Text != null && parametersTextEntry.Text.Length > 0)
-				configuration.CommandLineParameters = parametersTextEntry.Text.Trim ();
-			
-			configuration.ExternalConsole = externalConsoleCheckbox.Active;
-			configuration.PauseConsoleOutput = pauseCheckbox.Active;
-		}
+    public class OutputOptionsPanel : NSViewController
+    {
+        private CProjectConfiguration configuration;
 
-		protected virtual void OnExternalConsoleCheckboxClicked (object sender, System.EventArgs e)
-		{
-			pauseCheckbox.Sensitive = externalConsoleCheckbox.Active;
-		}
-	}
-	
-	public class OutputOptionsPanelBinding : MultiConfigItemOptionsPanel
-	{
-		private OutputOptionsPanel panel;
-		
-		public override Control CreatePanelWidget ()
-		{
-			return panel = new OutputOptionsPanel ();
-		}
-		
-		public override void LoadConfigData ()
-		{
-			panel.Load ((CProjectConfiguration) CurrentConfiguration);
-		}
-		
-		public override void ApplyChanges ()
-		{
-			panel.Store ();
-		}
-	}
+        public OutputOptionsPanel ()
+        {
+            //table1.RowSpacing = 3;
+        }
+
+        public void Load (CProjectConfiguration configuration)
+        {
+            this.configuration = configuration;
+
+            //outputNameTextEntry.Text = configuration.Output;
+            //outputEntry.Path = configuration.OutputDirectory;
+            //parametersTextEntry.Text = configuration.CommandLineParameters;
+
+            //if (externalConsoleCheckbox.Active)
+            //    pauseCheckbox.Sensitive = true;
+
+            //externalConsoleCheckbox.Active = configuration.ExternalConsole;
+            //pauseCheckbox.Active = configuration.PauseConsoleOutput;
+        }
+
+        public void Store ()
+        {
+            if (configuration == null)
+                return;
+
+            //if (outputNameTextEntry != null && outputNameTextEntry.Text.Length > 0)
+            //    configuration.Output = outputNameTextEntry.Text.Trim ();
+
+            //var newPath = outputEntry.Path.Trim ();
+            //if (!string.IsNullOrEmpty (newPath))
+            //    configuration.OutputDirectory = newPath;
+
+            //if (parametersTextEntry.Text != null && parametersTextEntry.Text.Length > 0)
+            //    configuration.CommandLineParameters = parametersTextEntry.Text.Trim ();
+
+            //configuration.ExternalConsole = externalConsoleCheckbox.Active;
+            //configuration.PauseConsoleOutput = pauseCheckbox.Active;
+        }
+
+        protected virtual void OnExternalConsoleCheckboxClicked (object sender, System.EventArgs e)
+        {
+            //pauseCheckbox.Sensitive = externalConsoleCheckbox.Active;
+        }
+    }
+
+    public class OutputOptionsPanelBinding : CocoaMultiConfigItemOptionsPanel
+    {
+        private OutputOptionsPanel panel;
+
+        public override Control CreatePanelWidget ()
+        {
+            panel ??= new OutputOptionsPanel ();
+            return panel.View;
+        }
+
+        public override void LoadConfigData ()
+        {
+            panel.Load ((CProjectConfiguration)CurrentConfiguration);
+        }
+
+        public override void ApplyChanges ()
+        {
+            panel.Store ();
+        }
+    }
 }

@@ -15,14 +15,14 @@ namespace CBinding.Parser
 		SymbolDatabaseMediator db;
 		string file;
 		CancellationToken token;
-		//CXCursor TUCursor;
+		CXCursor TUCursor;
 
 		public TranslationUnitParser (SymbolDatabaseMediator db, string file, CancellationToken cancelToken, CXCursor TUcur)
 		{
 			this.db = db;
 			this.file = file;
 			token = cancelToken;
-			//TUCursor = TUcur;
+			TUCursor = TUcur;
 		}
 
 		public CXChildVisitResult Visit (CXCursor cursor, CXCursor parent, IntPtr data)

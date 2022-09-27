@@ -35,94 +35,94 @@ using Mono.Addins;
 using MonoDevelop.Components;
 using MonoDevelop.Ide.Gui.Dialogs;
 using MonoDevelop.Ide;
+using AppKit;
 
 namespace CBinding
 {
-	public partial class CompilerPanel : Gtk.Bin
-	{
-		private CProject project;
-		private object[] compilers;
-		private ICompiler active_compiler;
+    public class CompilerPanel : NSViewController
+    {
+        private CProject project;
+        private object [] compilers;
+        private ICompiler active_compiler;
 
-		public CompilerPanel (CProject project)
-		{
-			this.Build ();
-			
-			this.project = project;
-			
-			compilers = AddinManager.GetExtensionObjects ("/CBinding/Compilers");
-			
-			foreach (ICompiler compiler in compilers) {
-				compilerComboBox.AppendText (compiler.Name);
-			}
-			
-			int active = 0;
-			Gtk.TreeIter iter;
-			Gtk.ListStore store = (Gtk.ListStore)compilerComboBox.Model;
-			store.GetIterFirst (out iter);
-			while (store.IterIsValid (iter)) {
-				if ((string)store.GetValue (iter, 0) == project.Compiler.Name) {
-					break;
-				}
-				store.IterNext (ref iter);
-				active++;
-			}
+        public CompilerPanel (CProject project)
+        {
+            this.project = project;
 
-			compilerComboBox.Active = active;
-			
-			useCcacheCheckBox.Active = ((CProjectConfiguration)project.GetConfiguration (IdeApp.Workspace.ActiveConfiguration)).UseCcache;
-			
-			Update ();
-		}
+            //compilers = AddinManager.GetExtensionObjects ("/CBinding/Compilers");
 
-		public void Store ()
-		{
-			if (project == null)
-				return;
-			
-			if (!active_compiler.Equals (project.Compiler)) {
-				project.Compiler = active_compiler;
-				project.Language = active_compiler.Language;
-			}
-			
-			// Update use_ccache for all configurations
-			foreach (CProjectConfiguration conf in project.Configurations)
-				conf.UseCcache = useCcacheCheckBox.Active;
-		}
+            //foreach (ICompiler compiler in compilers) {
+            //    compilerComboBox.AppendText (compiler.Name);
+            //}
 
-		protected virtual void OnCompilerComboBoxChanged (object sender, EventArgs e)
-		{
-			Update ();
-		}
+            //int active = 0;
+            //Gtk.TreeIter iter;
+            //Gtk.ListStore store = (Gtk.ListStore)compilerComboBox.Model;
+            //store.GetIterFirst (out iter);
+            //while (store.IterIsValid (iter)) {
+            //    if ((string)store.GetValue (iter, 0) == project.Compiler.Name) {
+            //        break;
+            //    }
+            //    store.IterNext (ref iter);
+            //    active++;
+            //}
 
-		private void Update ()
-		{
-			foreach (ICompiler compiler in compilers) {
-				if (compilerComboBox.ActiveText == compiler.Name) {
-					active_compiler = compiler;
-					break;
-				}
-			}
-			
-			if (active_compiler.SupportsCcache)
-				useCcacheCheckBox.Sensitive = true;
-			else
-				useCcacheCheckBox.Sensitive = false;
-		}
-	}
+            //compilerComboBox.Active = active;
 
-	public class CompilerPanelBinding : ItemOptionsPanel
-	{
-		CompilerPanel panel;
+            //useCcacheCheckBox.Active = ((CProjectConfiguration)project.GetConfiguration (IdeApp.Workspace.ActiveConfiguration)).UseCcache;
 
-		public override Control CreatePanelWidget ()
-		{
-			return panel = new CompilerPanel ((CProject)ConfiguredProject);
-		}
+            Update ();
+        }
 
-		public override void ApplyChanges ()
-		{
-			panel.Store ();
-		}
-	}
+        public void Store ()
+        {
+            if (project == null)
+                return;
+
+            if (!active_compiler.Equals (project.Compiler)) {
+                project.Compiler = active_compiler;
+                project.Language = active_compiler.Language;
+            }
+
+            // Update use_ccache for all configurations
+            //foreach (CProjectConfiguration conf in project.Configurations)
+            //    conf.UseCcache = useCcacheCheckBox.Active;
+        }
+
+        protected virtual void OnCompilerComboBoxChanged (object sender, EventArgs e)
+        {
+            Update ();
+        }
+
+        private void Update ()
+        {
+            //foreach (ICompiler compiler in compilers) {
+            //    if (compilerComboBox.ActiveText == compiler.Name) {
+            //        active_compiler = compiler;
+            //        break;
+            //    }
+            //}
+
+            //if (active_compiler.SupportsCcache)
+            //    useCcacheCheckBox.Sensitive = true;
+            //else
+            //    useCcacheCheckBox.Sensitive = false;
+        }
+    }
+
+    public class CompilerPanelBinding : ItemOptionsPanel
+    {
+        CompilerPanel panel;
+
+        public override Control CreatePanelWidget ()
+        {
+            panel ??= new CompilerPanel ((CProject)ConfiguredProject);
+            return panel.View;
+        }
+
+        public override void ApplyChanges ()
+        {
+            panel.Store ();
+        }
+    }
 }

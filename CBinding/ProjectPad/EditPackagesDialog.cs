@@ -1,5 +1,5 @@
-//
-// FunctionNodeBuilder.cs
+﻿//
+// ProjectPackagesFolderNodeBuilder.cs: Node to control the packages in the project
 //
 // Authors:
 //   Marcos David Marin Amador <MarcosMarin@gmail.com>
@@ -29,29 +29,17 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using CBinding.Parser;
-using MonoDevelop.Ide;
-using MonoDevelop.Ide.Editor;
-using MonoDevelop.Ide.Gui;
-using MonoDevelop.Ide.Gui.Components;
+using MonoDevelop.Components;
 
-namespace CBinding.Navigation
+namespace CBinding.ProjectPad
 {
+    internal class EditPackagesDialog : Dialog
+    {
+        private CProject project;
 
-    public class SymbolCommandHandler : NodeCommandHandler
-	{
-		public override void ActivateItem ()
-		{
-			Symbol item = (Symbol)CurrentNode.DataItem;
-            Document doc = IdeApp.Workbench.OpenDocument (item.FileName).Result;
-            bool isMacro = item is Macro;
-
-			//   textView.Caret.MoveTo(textView.TextSnapshot.GetLineFromLineNumber(bp.Line).Start);
-			var textView = doc.GetTextView ();
-			var line = textView.TextSnapshot.GetLineFromLineNumber (item.Begin.Line);
-			textView.Caret.MoveTo (line.Start + item.Begin.Column);
-
-			//doc.Editor.CaretLocation = new DocumentLocation (item.Begin.Line, item.Begin.Column); // TODO: get column?
+        public EditPackagesDialog (CProject project)
+        {
+            this.project = project;
         }
     }
 }

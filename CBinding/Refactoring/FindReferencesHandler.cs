@@ -32,14 +32,14 @@ namespace CBinding.Refactoring
 			project = proj;
 			if (!proj.HasLibClang)
 				return;
-			
-			cursorReferenced = project.ClangManager.GetCursorReferenced(
-				project.ClangManager.GetCursor (
-					doc.FileName,
-					doc.Editor.CaretLocation
+
+			cursorReferenced = project.ClangManager.GetCursorReferenced (
+                project.ClangManager.GetCursor (
+                    doc.FileName,
+					doc.GetTextView ().GetCaretLocation()
 				)
-			);
-			UsrReferenced = project.ClangManager.GetCursorUsrString (cursorReferenced);
+            );
+            UsrReferenced = project.ClangManager.GetCursorUsrString (cursorReferenced);
 		}
 
 		List<Reference> references = new List<Reference>();
@@ -58,21 +58,25 @@ namespace CBinding.Refactoring
 			CXCursor referenced = project.ClangManager.GetCursorReferenced (cursor);
 			string Usr = project.ClangManager.GetCursorUsrString (referenced);
 
-			if (UsrReferenced.Equals (Usr)) {
-				CXSourceRange range = clang.Cursor_getSpellingNameRange (cursor, 0, 0);
-				var reference = new Reference (project, cursor, range);
+            if (UsrReferenced.Equals (Usr)) {
+                CXSourceRange range = clang.Cursor_getSpellingNameRange (cursor, 0, 0);
+                var reference = new Reference (project, cursor, range);
 
-				//FIXME: don't block!
-				Document doc = IdeApp.Workbench.OpenDocument (reference.FileName, project, false).Result;
-				if (!references.Contains (reference)
-					//this check is needed because explicit namespace qualifiers, eg: "std" from std::toupper
-					//are also found when finding eg:toupper references, but has the same cursorkind as eg:"toupper"
-					&& doc.Editor.GetTextAt (reference.Begin.Offset, reference.Length).Equals (referenced.ToString ())){
-					references.Add (reference);
-				}			
+                //FIXME: don't block!
+                Document doc = IdeApp.Workbench.OpenDocument (reference.FileName, project, false).Result;
 
-			}
-			return CXChildVisitResult.Recurse;
+				var editor = doc.GetTextView ();
+
+
+                //if (!references.Contains (reference)
+                //    //this check is needed because explicit namespace qualifiers, eg: "std" from std::toupper
+                //    //are also found when finding eg:toupper references, but has the same cursorkind as eg:"toupper"
+                //    && doc.Editor.GetTextAt (reference.Begin.Offset, reference.Length).Equals (referenced.ToString ())) {
+                //    references.Add (reference);
+                //}
+
+            }
+            return CXChildVisitResult.Recurse;
 		}
 
 		/// <summary>
@@ -81,28 +85,29 @@ namespace CBinding.Refactoring
 		/// <param name="project">Project.</param>
 		public void FindRefs (CProject project)
 		{
-			var monitor = IdeApp.Workbench.ProgressMonitors.GetSearchProgressMonitor (true, true);
-			try {			
-				lock(project.ClangManager.SyncRoot)
-					project.ClangManager.FindReferences(this);
-				foreach (var reference in references) {
-					var sr = new SearchResult (
-						new FileProvider (reference.FileName),
-						reference.Offset,
-						reference.Length
-					);
-					monitor.ReportResult (sr);
-				}
-			} catch (Exception ex) {
-				if (monitor != null)
-					monitor.ReportError ("Error finding references", ex);
-				else
-					LoggingService.LogError ("Error finding references", ex);
-			} finally {
-				if (monitor != null)
-					monitor.Dispose ();
-			}
-		}
+            var monitor = IdeApp.Workbench.ProgressMonitors.GetSearchProgressMonitor (true, true);
+            try {
+                lock (project.ClangManager.SyncRoot)
+                    project.ClangManager.FindReferences (this);
+                foreach (var reference in references) {
+
+					var sr = SearchResult.Create (reference.FileName, reference.Offset,
+						reference.Length);
+					//var sr = new SearchResult (
+     //                   new FileProvider (),
+     //               );
+                    monitor.ReportResult (sr);
+                }
+            } catch (Exception ex) {
+                if (monitor != null)
+                    monitor.ReportError ("Error finding references", ex);
+                else
+                    LoggingService.LogError ("Error finding references", ex);
+            } finally {
+                if (monitor != null)
+                    monitor.Dispose ();
+            }
+        }
 
 		/// <summary>
 		/// Update the specified info.
@@ -133,8 +138,6 @@ namespace CBinding.Refactoring
 		{
 			return clang.isReference (cursor.kind) != 0 || clang.isDeclaration (cursor.kind) != 0;
 		}
-
 	}
-
 }
 

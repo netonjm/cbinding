@@ -1,35 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
-  <Import Project="..\packages\MonoDevelop.Addins.0.3.10\build\net40\MonoDevelop.Addins.props" Condition="Exists('..\packages\MonoDevelop.Addins.0.3.10\build\net40\MonoDevelop.Addins.props')" />
+
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectTypeGuids>{86F6BF2A-E449-4B3E-813B-9ACC37E5545F};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ProjectGuid>{335583F6-C4BA-4671-A763-5DE78985CD97}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AssemblyName>MonoDevelop.CBinding</AssemblyName>
-    <RootNamespace>CBinding</RootNamespace>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <AdjacentMD>..\..\monodevelop\main\build\bin</AdjacentMD>
-    <MDBinDir Condition="Exists('$(AdjacentMD)')">$(AdjacentMD)</MDBinDir>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>True</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Properties\Manifest.addin.xml" />
+    <PackageReference Include="Microsoft.VisualStudioMac.Sdk" Version="17.0.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.8" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Microsoft.VisualStudioMac.Sdk" />
+    <None Remove="Microsoft.Data.Sqlite" />
+    <None Remove="CLang\Editor\" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="templates\EmptyCProject.xpt.xml">
       <LogicalName>EmptyCProject.xpt.xml</LogicalName>
     </EmbeddedResource>
@@ -38,9 +24,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="templates\EmptyCppProject.xpt.xml">
       <LogicalName>EmptyCppProject.xpt.xml</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="gtk-gui\gui.stetic">
-      <LogicalName>gui.stetic</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="templates\EmptyCHeaderFile.xft.xml">
       <LogicalName>EmptyCHeaderFile.xft.xml</LogicalName>
@@ -97,147 +80,19 @@
       <LogicalName>CMake-Syntax</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="Navigation\ClassPadEventArgs.cs" />
-    <None Include="Navigation\EnumerationNodeBuilder.cs" />
-    <None Include="Navigation\EnumeratorNodeBuilder.cs" />
-    <None Include="Navigation\FunctionNodeBuilder.cs" />
-    <None Include="Navigation\GlobalsNodeBuilder.cs" />
-    <None Include="Navigation\MacroDefinitionsNodeBuilder.cs" />
-    <None Include="Navigation\MacroNodeBuilder.cs" />
-    <None Include="Navigation\NamespaceNodeBuilder.cs" />
-    <None Include="Navigation\ProjectNodeBuilderExtension.cs" />
-    <None Include="Navigation\TypedefNodeBuilder.cs" />
-    <None Include="Navigation\UnionNodeBuilder.cs" />
-    <None Include="Navigation\VariableNodeBuilder.cs" />
-    <None Include="Navigation\SymbolEventArgs.cs" />
-    <None Include="Navigation\SymbolCommandHandler.cs" />
-    <None Include="Navigation\StructNodeBuilder.cs" />
-    <None Include="Navigation\FieldNodeBuilder.cs" />
-    <None Include="Navigation\ClassNodeBuilder.cs" />
-    <None Include="Navigation\ClassTemplateNodeBuilder.cs" />
-    <None Include="Navigation\ClassTemplatePartialNodeBuilder.cs" />
-    <None Include="Navigation\MemberFunctionNodeBuilder.cs" />
-    <None Include="Navigation\FunctionTemplateNodeBuilder.cs" />
     <None Include="..\external\libclang-binary\libclang.dylib">
       <Link>libclang.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="app.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="templates\" />
-    <Folder Include="icons\" />
-    <Folder Include="gtk-gui\" />
-    <Folder Include="Compiler\" />
-    <Folder Include="Project\" />
-    <Folder Include="Parser\" />
-    <Folder Include="Navigation\" />
-    <Folder Include="Gui\" />
-    <Folder Include="ProjectPad\" />
-    <Folder Include="Refactoring\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Mono.Posix" />
-    <Reference Include="System" />
-    <Reference Include="System.Xml" />
-    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-    </Reference>
-    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-    </Reference>
-    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-    </Reference>
-    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="Mono.Data.Sqlite" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Project\CProject.cs" />
-    <Compile Include="Project\CProjectConfiguration.cs" />
-    <Compile Include="gtk-gui\generated.cs" />
-    <Compile Include="Gui\CodeGenerationPanel.cs" />
-    <Compile Include="Compiler\CCompiler.cs" />
-    <Compile Include="Compiler\GccCompiler.cs" />
-    <Compile Include="Compiler\GppCompiler.cs" />
-    <Compile Include="Compiler\GNUCompiler.cs" />
-    <Compile Include="Gui\CompilerPanel.cs" />
-    <Compile Include="gtk-gui\CBinding.CodeGenerationPanel.cs" />
-    <Compile Include="gtk-gui\CBinding.CompilerPanel.cs" />
-    <Compile Include="Compiler\ICompiler.cs" />
-    <Compile Include="Project\ProjectPackageCollection.cs" />
-    <Compile Include="Gui\EditPackagesDialog.cs" />
-    <Compile Include="gtk-gui\CBinding.EditPackagesDialog.cs" />
-    <Compile Include="Project\Package.cs" />
-    <Compile Include="Project\ProjectPackageEventArgs.cs" />
-    <Compile Include="Gui\OutputOptionsPanel.cs" />
-    <Compile Include="gtk-gui\CBinding.OutputOptionsPanel.cs" />
-    <Compile Include="ProjectPad\ProjectReferencesExtension.cs" />
-    <Compile Include="ProjectPad\ProjectPackagesFolderNodeBuilder.cs" />
-    <Compile Include="ProjectPad\ProjectPackageNodeBuilder.cs" />
-    <Compile Include="ProjectPad\ProjectNodeExtension.cs" />
-    <Compile Include="ProjectPad\FolderBasedProjectNodeBuilder.cs" />
-    <Compile Include="ProjectPad\CMakeTargetNodeBuilder.cs" />
-    <Compile Include="Gui\CTextEditorExtension.cs" />
-    <Compile Include="Gui\GeneralOptionsPanel.cs" />
-    <Compile Include="gtk-gui\CBinding.GeneralOptionsPanel.cs" />
-    <Compile Include="Gui\PackageDetails.cs" />
-    <Compile Include="gtk-gui\CBinding.PackageDetails.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\AddinInfo.cs" />
-    <Compile Include="CLang\CLangManager.cs" />
-    <Compile Include="Compiler\ClangCCompiler.cs" />
-    <Compile Include="Compiler\ClangCXXCompiler.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="Generated.cs" />
-    <Compile Include="Parser\ClangCompletionUnit.cs" />
-    <Compile Include="Parser\ClangCompletionCategory.cs" />
-    <Compile Include="Parser\Symbol.cs" />
-    <Compile Include="Parser\TranslationUnitParser.cs" />
-    <Compile Include="Parser\SourceLocation.cs" />
-    <Compile Include="Refactoring\Reference.cs" />
-    <Compile Include="Refactoring\FindReferencesHandler.cs" />
-    <Compile Include="Refactoring\FindDerivedSymbolsHandler.cs" />
-    <Compile Include="Parser\DataProvider.cs" />
-    <Compile Include="Parser\DataWrapper.cs" />
-    <Compile Include="Refactoring\GotoDefinitionHandler.cs" />
-    <Compile Include="Refactoring\RefactoryCommands.cs" />
-    <Compile Include="Refactoring\GotoDeclarationHandler.cs" />
-    <Compile Include="Parser\CDocumentParser.cs" />
-    <Compile Include="Gui\RenameHandlerDialog.cs" />
-    <Compile Include="gtk-gui\CBinding.RenameHandlerDialog.cs" />
-    <Compile Include="Parser\OverloadCandidate.cs" />
-    <Compile Include="Parser\CParsedDocument.cs" />
-    <Compile Include="Project\UnsavedFilesManager.cs" />
-    <Compile Include="Project\UnsavedFile.cs" />
-    <Compile Include="Parser\SymbolDatabaseMediator.cs" />
-    <Compile Include="CLang\SerializationManager.cs" />
-    <Compile Include="CMake\CMakeCompletionDataLists.cs" />
-    <Compile Include="CMake\CMakeTextEditorExtension.cs" />
-    <Compile Include="CMake\CMakeFileFormat.cs" />
-    <Compile Include="CMake\CMakeTarget.cs" />
-    <Compile Include="CMake\CMakeCommand.cs" />
-    <Compile Include="CMake\CMakeArgument.cs" />
-    <Compile Include="CMake\CMakeProject.cs" />
-    <Compile Include="CMake\CMakeWorkspaceObjectReader.cs" />
-    <Compile Include="CMake\CMakeVariableManager.cs" />
-    <Compile Include="ProjectPad\SystemFolder.cs" />
-    <Compile Include="ProjectPad\SystemFolderNodeBuilder.cs" />
-    <Compile Include="CMake\CMakeVariable.cs" />
-    <Compile Include="Project\FolderBasedProject.cs" />
-    <Compile Include="ProjectPad\SystemFileNodeBuilder.cs" />
-    <Compile Include="Gui\TargetPickerDialog.cs" />
-    <Compile Include="gtk-gui\CBinding.TargetPickerDialog.cs" />
-    <Compile Include="gtk-gui\CBinding.NewTargetDialog.cs" />
-    <Compile Include="Gui\NewTargetDialog.cs" />
   </ItemGroup>
   <ItemGroup>
     <AddinReference Include="MonoDevelop.Refactoring" />
     <AddinReference Include="MonoDevelop.DesignerSupport" />
     <AddinReference Include="MonoDevelop.Xml" />
   </ItemGroup>
-  <Import Project="..\packages\MonoDevelop.Addins.0.3.10\build\net40\MonoDevelop.Addins.targets" Condition="Exists('..\packages\MonoDevelop.Addins.0.3.10\build\net40\MonoDevelop.Addins.targets')" />
+  <ItemGroup>
+    <Folder Include="CLang\Editor\" />
+  </ItemGroup>
 </Project>

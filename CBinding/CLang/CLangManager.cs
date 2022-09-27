@@ -212,12 +212,12 @@ namespace CBinding
 		/// <param name = "fileName"></param>
 		/// <returns>IntPtr which should be marshalled as CXCodeCompleteResults</returns>
 		public IntPtr CodeComplete (
-			CodeCompletionContext completionContext,
+			int line, int column,
 			CXUnsavedFile[] unsavedFiles,
 			string fileName)
 		{
-				uint complete_line = (uint) (completionContext.TriggerLine);
-				uint complete_column = (uint) (completionContext.TriggerLineOffset + 1);
+				uint complete_line = (uint) (line);
+				uint complete_column = (uint) (column + 1);
 				uint numUnsavedFiles = (uint) (unsavedFiles.Length);
 				uint options = (uint) CXCodeComplete_Flags.IncludeCodePatterns | (uint)CXCodeComplete_Flags.IncludeCodePatterns;
 			lock (SyncRoot) {
@@ -233,43 +233,45 @@ namespace CBinding
 			}
 		}
 
-		/// <summary>
-		/// Gets a cursor
-		/// </summary>
-		/// <param name="fileName">
-		/// A <see cref="string"/>: the filename which a Translation Unit (probably containing the cursor) is associated with.
-		/// </param>
-		/// <param name="location">
-		/// A <see cref="MonoDevelop.Ide.Editor.DocumentLocation"/>: the location in the document (named fileName)
-		/// </param>
-		/// <returns>
-		/// A <see cref="CXCursor"/>: the cursor under the location
-		/// </returns>
-		public CXCursor GetCursor (string fileName, MonoDevelop.Ide.Editor.DocumentLocation location)
-		{
-			lock (SyncRoot) {
-				CXTranslationUnit TU = translationUnits [fileName];
-				CXFile file = clang.getFile (TU, fileName);
-				CXSourceLocation loc = clang.getLocation (
-					TU,
-					file,
-					(uint) (location.Line),
-					(uint) (location.Column)
-				);
-				return clang.getCursor (TU, loc);
-			}
-		}
+		// <summary>
+		// Gets a cursor
+		// </summary>
+		// <param name = "fileName" >
 
-		/// <summary>
-		/// Gets the cursor refenced by refereeCursor. If the cursor is a declaration/definition, returns itself.
-		/// </summary>
-		/// <param name="refereeCursor">
-		/// A <see cref="CXCursor"/>: a cursor referencing another
-		/// </param>
-		/// <returns>
-		/// A <see cref="CXCursor"/>: the cursor referenced
-		/// </returns>
-		public CXCursor GetCursorReferenced (CXCursor refereeCursor)
+		// A < see cref="string"/>: the filename which a Translation Unit (probably containing the cursor) is associated with.
+		// </param>
+		// <param name = "location" >
+
+		// A < see cref= "MonoDevelop.Ide.Editor.DocumentLocation" />: the location in the document (named fileName)
+		// </param>
+		// <returns>
+		// A<see cref="CXCursor"/>: the cursor under the location
+		// </returns>
+		public CXCursor GetCursor (string fileName, (int Line, int Column) location)
+        {
+            lock (SyncRoot) {
+                CXTranslationUnit TU = translationUnits [fileName];
+                CXFile file = clang.getFile (TU, fileName);
+                CXSourceLocation loc = clang.getLocation (
+                    TU,
+                    file,
+                    (uint)(location.Line),
+                    (uint)(location.Column)
+                );
+                return clang.getCursor (TU, loc);
+            }
+        }
+
+        /// <summary>
+        /// Gets the cursor refenced by refereeCursor. If the cursor is a declaration/definition, returns itself.
+        /// </summary>
+        /// <param name="refereeCursor">
+        /// A <see cref="CXCursor"/>: a cursor referencing another
+        /// </param>
+        /// <returns>
+        /// A <see cref="CXCursor"/>: the cursor referenced
+        /// </returns>
+        public CXCursor GetCursorReferenced (CXCursor refereeCursor)
 		{
 			lock (SyncRoot) {
 				return clang.getCursorReferenced (refereeCursor);
@@ -528,8 +530,10 @@ namespace CBinding
 					e.ProjectFile.BuildAction = BuildAction.None;
 				}
 
-				if (!project.Loading && e.ProjectFile.BuildAction == BuildAction.Compile)
-					TypeSystemService.ParseFile (project, e.ProjectFile.Name);
+				if (!project.Loading && e.ProjectFile.BuildAction == BuildAction.Compile) {
+					//TypeSystemService.ParseFile (project, e.ProjectFile.Name);
+				}
+					
 			}
 		}
 
@@ -623,7 +627,7 @@ namespace CBinding
 			GC.SuppressFinalize(this);
 		}
 
-		#endregion
-	}
+        #endregion
+    }
 }
 

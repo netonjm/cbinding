@@ -1157,7 +1157,7 @@ namespace ClangSharp
 	[SuppressUnmanagedCodeSecurity]
 	public static partial class clang
 	{
-		private const string libraryPath = "clang37";
+		private const string libraryPath = "/Users/jmedrano/cbinding/external/libclang-binary/libclang.dylib";
 
 		[DllImport(libraryPath, EntryPoint = "clang_getCString", CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr getCString(CXString @string);

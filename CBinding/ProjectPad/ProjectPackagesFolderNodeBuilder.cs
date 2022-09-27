@@ -37,6 +37,8 @@ using MonoDevelop.Ide.Gui.Components;
 using MonoDevelop.Ide;
 using MonoDevelop.Projects;
 using System.Collections.Generic;
+using AppKit;
+using CoreGraphics;
 
 namespace CBinding.ProjectPad
 {	
@@ -122,8 +124,16 @@ namespace CBinding.ProjectPad
 		{
 			CProject project = (CProject)CurrentNode.GetParentDataItem (
 			    typeof(CProject), false);
-			
-			MessageService.ShowCustomDialog (new EditPackagesDialog (project));
+
+			var viewController = new EditPackagesDialogViewController (project);
+			var window = NSWindow.GetWindowWithContentViewController (viewController);
+			window.Title = "Edit Packages";
+
+			var size = new CGSize (600, 400);
+			window.MinSize = size;
+			window.SetContentSize (size);
+
+			MessageService.ShowCustomDialog (window);
 			
 			IdeApp.ProjectOperations.SaveAsync (project);
 			CurrentNode.Expanded = true;

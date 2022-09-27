@@ -5,6 +5,8 @@ using CBinding.Parser;
 using MonoDevelop.Core;
 using MonoDevelop.Ide.FindInFiles;
 using System;
+using MonoDevelop.Ide.Gui.Documents;
+using Microsoft.VisualStudio.Text.Editor;
 
 namespace CBinding.Refactoring
 {
@@ -20,26 +22,27 @@ namespace CBinding.Refactoring
 		{
 			var monitor = IdeApp.Workbench.ProgressMonitors.GetSearchProgressMonitor (true, true);
 			try {
-				var doc = IdeApp.Workbench.ActiveDocument;
-				var project = (CProject)doc.Project;
-				CXCursor cursor = project.ClangManager.GetCursor (doc.FileName, doc.Editor.CaretLocation);
-				CXCursor referredCursor = project.ClangManager.GetCursorReferenced (cursor);
-				bool leastOne = false;
-				foreach (var decl in project.DB.GetDefinitionLocation (referredCursor)) {
-					leastOne = true;
-					var sr = new SearchResult (
-						new FileProvider (decl.FileName),
-						decl.Offset,
-						1
-					);
-					monitor.ReportResult (sr);
-				}
-				if (!leastOne) {
-					CXCursor defCursor = project.ClangManager.GetCursorDefinition (referredCursor);
-					var loc = project.ClangManager.GetCursorLocation (defCursor);
-					IdeApp.Workbench.OpenDocument (loc.FileName, project, loc.Line, loc.Column);
-				}
-			} catch (Exception ex) {
+                var doc = IdeApp.Workbench.ActiveDocument;
+				DocumentController documentController = doc.GetContent<DocumentController> ();
+				var project = (CProject)documentController.Owner;
+                CXCursor cursor = project.ClangManager.GetCursor (doc.FileName, (1,1));
+                CXCursor referredCursor = project.ClangManager.GetCursorReferenced (cursor);
+                bool leastOne = false;
+                foreach (var decl in project.DB.GetDefinitionLocation (referredCursor)) {
+                    leastOne = true;
+                    //var sr = new SearchResult (
+                    //    new FileProvider (decl.FileName),
+                    //    decl.Offset,
+                    //    1
+                    //);
+                    //monitor.ReportResult (sr);
+                }
+                if (!leastOne) {
+                    CXCursor defCursor = project.ClangManager.GetCursorDefinition (referredCursor);
+                    var loc = project.ClangManager.GetCursorLocation (defCursor);
+                    IdeApp.Workbench.OpenDocument (loc.FileName, project, loc.Line, loc.Column);
+                }
+            } catch (Exception ex) {
 				if (monitor != null)
 					monitor.ReportError ("Error finding definition", ex);
 				else
@@ -57,19 +60,26 @@ namespace CBinding.Refactoring
 		/// <param name="info">Info.</param>
 		protected override void Update (CommandInfo info)
 		{
-			var doc = IdeApp.Workbench.ActiveDocument;
-			CProject project;
-			if (doc == null || (project = doc.Project as CProject) == null || !project.HasLibClang) {
-				info.Enabled = info.Visible = false;
-				return;
-			}
+            var doc = IdeApp.Workbench.ActiveDocument;
 
-			CXCursor cursor = project.ClangManager.GetCursor (doc.FileName, doc.Editor.CaretLocation);
-			CXCursor referredCursor = project.ClangManager.GetCursorReferenced (cursor);
-			CXCursor defCursor = project.ClangManager.GetCursorDefinition (referredCursor);
-			var loc = project.ClangManager.GetCursorLocation (defCursor);
-			info.Enabled = info.Visible = (clang.Cursor_isNull (referredCursor) == 0 && loc.FileName != null);
-		}
+			var documentController = doc?.GetContent<DocumentController> ();
+			CProject project = documentController?.Owner as CProject;
+            if (doc == null || project == null || !project.HasLibClang) {
+                info.Enabled = info.Visible = false;
+                return;
+            }
+
+			var view = doc.GetContent<ITextView> ();
+			var pos = view.Caret.Position.BufferPosition;
+			var line = pos.Snapshot.GetLineFromPosition (pos.Position);
+
+			//TODO: get line and column
+		   CXCursor cursor = project.ClangManager.GetCursor (doc.FileName, (line.LineNumber,0));
+            CXCursor referredCursor = project.ClangManager.GetCursorReferenced (cursor);
+            CXCursor defCursor = project.ClangManager.GetCursorDefinition (referredCursor);
+            var loc = project.ClangManager.GetCursorLocation (defCursor);
+            info.Enabled = info.Visible = (clang.Cursor_isNull (referredCursor) == 0 && loc.FileName != null);
+        }
 
 	}
 }

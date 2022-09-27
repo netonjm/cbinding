@@ -1,5 +1,6 @@
 using System;
 using ClangSharp;
+using MonoDevelop.Core;
 
 namespace CBinding.Parser
 {
@@ -8,7 +9,9 @@ namespace CBinding.Parser
 	/// </summary>
 	public class Symbol
 	{
-
+		public bool IsDefinition { get; internal set; }
+		public string Name { get; internal set; }
+		public CX_CXXAccessSpecifier Access { get; internal set; }
 		public SourceLocation Begin { get; }
 
 		public CXCursor Represented { get; }
@@ -16,8 +19,9 @@ namespace CBinding.Parser
 		public string Usr { get; }
 
 		public bool Def { get; }
+        public FilePath FileName { get; internal set; }
 
-		public Symbol (CProject project, CXCursor cursor)
+        public Symbol (CProject project, CXCursor cursor)
 		{
 			lock (project.ClangManager.SyncRoot) {
 				Represented = cursor;

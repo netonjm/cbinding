@@ -7,5 +7,8 @@ namespace CBinding.Parser
 		public Namespace (CProject proj, CXCursor cursor) : base (proj, cursor)
 		{
 		}
-	}
+
+        public object ParentCursor { get; internal set; }
+        public object Parent { get; internal set; }
+    }
 }

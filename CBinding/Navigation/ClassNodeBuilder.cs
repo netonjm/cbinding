@@ -97,12 +97,12 @@ namespace CBinding.Navigation
 			bool publicOnly = treeBuilder.Options ["PublicApiOnly"];
 			Class thisClass = (Class)dataObject;
 
-			/*foreach (Symbol s in info.CanBeInClasses.Values)
+            /*foreach (Symbol s in info.CanBeInClasses.Values)
 				if (s.Ours && s.Parent != null && s.Parent.Equals (thisClass) && (!publicOnly || s.Access == CX_CXXAccessSpecifier.@Public))
 					treeBuilder.AddChild (s);*/
-		}
+        }
 
-		public override bool HasChildNodes (ITreeBuilder builder, object dataObject)
+        public override bool HasChildNodes (ITreeBuilder builder, object dataObject)
 		{
 			return true;
 		}

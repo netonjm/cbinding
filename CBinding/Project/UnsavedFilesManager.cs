@@ -27,23 +27,27 @@ namespace CBinding
 		{
 			e.Document.Saved += HandleSave;
 			e.Document.Closed += HandleClose;
-			UnsavedFileCollection.TryAdd (e.Document.Name, new UnsavedFile (false, e.Document.Editor.Text));
-		}
+
+			var document = e.Document;
+
+            UnsavedFileCollection.TryAdd (e.Document.Name, new UnsavedFile (false, e.Document.GetTextView().GetText()));
+        }
 
 		void HandleChange (object sender, EventArgs e)
 		{
-			if (current != null) {
-				current.Editor.TextChanged -= HandleTextChange;
-			}
+            if (current != null) {
+				current.GetTextView ().TextBuffer.Changed += HandleTextChange;
+            }
 
-			current = IdeApp.Workbench.ActiveDocument;
+            current = IdeApp.Workbench.ActiveDocument;
 
-			if (current != null) {
-				current.Editor.TextChanged += HandleTextChange;
-			}
-		}
+            if (current != null) {
+                current.GetTextView ().TextBuffer.Changed += HandleTextChange;
+            }
+        }
 
-		void HandleSave (object sender, EventArgs e)
+
+        void HandleSave (object sender, EventArgs e)
 		{
 			var document = (Document) sender;
 			UnsavedFileCollection [document.Name].IsDirty = false;
@@ -58,15 +62,16 @@ namespace CBinding
 			UnsavedFileCollection.TryRemove (document.Name, out dummy);
 		}
 
-		void HandleTextChange (object sender, TextChangeEventArgs e)
+		void HandleTextChange (object sender, Microsoft.VisualStudio.Text.TextContentChangedEventArgs e)
 		{
-			UnsavedFileCollection [current.Name].IsDirty = true;
-			UnsavedFileCollection [current.Name].Text = 
-				e.RemovalLength != 0 ?
-					UnsavedFileCollection [current.Name].Text.Remove (e.Offset, e.RemovalLength)
-					:
-					UnsavedFileCollection [current.Name].Text.Insert (e.Offset, e.InsertedText.Text);
-		}
+            UnsavedFileCollection [current.Name].IsDirty = true;
+            //e.Changes [0].
+            //UnsavedFileCollection [current.Name].Text =
+            //    e.RemovalLength != 0 ?
+            //        UnsavedFileCollection [current.Name].Text.Remove (e.Offset, e.RemovalLength)
+            //        :
+            //        UnsavedFileCollection [current.Name].Text.Insert (e.Offset, e.InsertedText.Text);
+        }
 
 		public List<CXUnsavedFile> Get ()
 		{

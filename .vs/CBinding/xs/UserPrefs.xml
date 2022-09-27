@@ -1,0 +1,68 @@
+﻿<Properties StartupConfiguration="{335583F6-C4BA-4671-A763-5DE78985CD97}|">
+  <MonoDevelop.Ide.ItemProperties.CBinding PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench>
+    <Files>
+      <File FileName="CBinding/CLang/CodeCompletionContext.cs" Line="93" Column="39" />
+      <File FileName="CBinding/CLang/Editor/CCompletionSourceProvider.cs" Line="117" Column="1" />
+      <File FileName="CBinding/CLang/CLangManager.cs" Line="124" Column="162" />
+      <File FileName="../Library/Caches/VisualStudio/17.0/Symbols/raw.githubusercontent.com/dotnet/runtime/70ae3df4a6f3c92fb6b315afc405edd10ff38579/src/libraries/System.Private.CoreLib/src/System/Runtime/CompilerServices/AsyncTaskMethodBuilderT.cs" Line="287" Column="1" />
+      <File FileName="../Library/Caches/VisualStudio/17.0/Symbols/raw.githubusercontent.com/dotnet/runtime/70ae3df4a6f3c92fb6b315afc405edd10ff38579/src/libraries/System.Private.CoreLib/src/System/Collections/Generic/List.cs" Line="1058" Column="1" />
+      <File FileName="CBinding/Generated.cs" Line="321" Column="24" />
+      <File FileName="CBinding/Parser/DataProvider.cs" Line="95" Column="4" NotebookId="1" />
+      <File FileName="CBinding/Parser/ClangCompletionUnit.cs" Line="8" Column="19" NotebookId="1" />
+      <File FileName="CBinding/CMake/CMakeTextEditorExtension.cs" Line="125" Column="20" NotebookId="1" />
+      <File FileName="CBinding/Gui/CTextEditorExtension.cs" Line="297" Column="60" NotebookId="1" />
+      <File FileName="CBinding/Navigation/DocumentExtension.cs" Line="48" Column="16" NotebookId="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="CBinding" expanded="True">
+            <Node name="CBinding" expanded="True">
+              <Node name="CLang" expanded="True">
+                <Node name="Editor" expanded="True" />
+              </Node>
+              <Node name="CMake" expanded="True" />
+              <Node name="Gui" expanded="True" />
+              <Node name="Navigation" expanded="True" />
+              <Node name="Parser" expanded="True" />
+              <Node name="Project" expanded="True" />
+              <Node name="ProjectPad" expanded="True" />
+              <Node name="Properties" expanded="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State>
+          <Value>(int)normalPackageTreeView.SelectedRow</Value>
+          <Value>configuration.OutputDirectory.ToString()</Value>
+          <Value>textView</Value>
+          <Value>documentController.Document</Value>
+          <Value>textView.Caret.Left</Value>
+          <Value>textViewLine.Left</Value>
+          <Value>textViewLine.Top</Value>
+          <Value>textViewLine.TextTop</Value>
+          <Value>caret.Position</Value>
+          <Value>caret.Offset</Value>
+          <Value> textView.Caret.Position.BufferPosition.Position</Value>
+          <Value>textView.Caret.ContainingTextViewLine.</Value>
+          <Value> textView.Caret.ContainingTextViewLine</Value>
+          <Value>textView.Caret</Value>
+          <Value>textView.Caret.Position</Value>
+          <Value>line.Start</Value>
+          <Value>line.Start.Position</Value>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <Debugger.DebugSourceFolders>
+    <String>/Users/jmedrano/Library/Caches/VisualStudio/17.0/Symbols/raw.githubusercontent.com/dotnet/runtime/70ae3df4a6f3c92fb6b315afc405edd10ff38579</String>
+  </Debugger.DebugSourceFolders>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
